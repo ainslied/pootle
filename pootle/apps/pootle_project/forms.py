@@ -21,6 +21,8 @@ from pootle_language.models import Language
 from pootle_misc.forms import LiberalModelChoiceField
 from pootle_project.models import Project
 from pootle_translationproject.models import TranslationProject
+from pootle_store.filetypes import filetype_choices
+from pootle_app.forms import ProjectForm
 from pootle_translationproject.signals import (tp_init_failed_async,
                                                tp_inited_async)
 
@@ -105,3 +107,23 @@ class TranslationProjectForm(forms.ModelForm):
                           response_url)
         connection.on_commit(_enqueue_job)
         return tp
+
+class ProjectAddForm(ProjectForm):
+    
+    localfiletype = forms.ChoiceField( choices=filetype_choices )
+    
+    class Meta(object):
+        model = Project
+        fields = ('id', 'code', 'fullname', 'checkstyle', 'localfiletype',
+                  'treestyle', 'source_language', 'ignoredfiles', 'report_email',
+                  'screenshot_search_prefix', 'disabled')
+
+class ProjectEditForm(ProjectForm):
+    
+    localfiletype = forms.ChoiceField( choices=filetype_choices )
+    
+    class Meta(object):
+        model = Project
+        fields = ('id', 'fullname', 'checkstyle', 'localfiletype',
+                  'treestyle', 'source_language', 'ignoredfiles', 'report_email',
+                  'screenshot_search_prefix', 'disabled') 

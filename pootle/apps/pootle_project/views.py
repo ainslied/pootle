@@ -20,7 +20,8 @@ from django.utils.safestring import mark_safe
 
 from pootle.core.browser import (
     make_language_item, make_project_list_item, make_xlanguage_item)
-from pootle.core.decorators import get_path_obj, permission_required
+from pootle.core.decorators import ( get_path_obj, permission_required,
+        editprojectenabled_required, addprojectenabled_required)
 from pootle.core.helpers import get_sidebar_announcements_context
 from pootle.core.paginator import paginate
 from pootle.core.url_helpers import split_pootle_path
@@ -38,6 +39,13 @@ from .apps import PootleProjectConfig
 from .forms import TranslationProjectFormSet
 from .models import Project, ProjectResource, ProjectSet
 
+from .forms import ProjectAddForm, ProjectEditForm
+from django.views.generic.edit import FormView
+from django.views.generic.edit import UpdateView
+from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import login_required
+from pootle_app.models.permissions import PermissionSet
+from django.contrib.auth.models import Permission
 
 class ProjectMixin(object):
     ns = "pootle.project"
@@ -350,3 +358,44 @@ class ProjectsBrowseView(ProjectsMixin, PootleBrowseView):
 
 class ProjectsTranslateView(ProjectsMixin, PootleTranslateView):
     required_permission = "administrate"
+
+
+class ProjectEditView(UpdateView):
+    template_name = 'projects/admin/project.html'
+    form_class = ProjectEditForm
+    model = Project
+    success_url = '/'
+
+    @method_decorator(editprojectenabled_required)
+    @method_decorator(get_path_obj)
+    @method_decorator(permission_required('administrate'))
+    def dispatch(self, *args, **kwargs):
+        return super(ProjectEditView, self).dispatch(*args, **kwargs)
+
+    def get_object(self, queryset=None):
+        instance = Project.objects.get(code=self.kwargs.get('project_code',''))
+        return instance
+
+    def form_valid(self, form):
+        form.save()
+        return super(ProjectEditView, self).form_valid(form)
+
+class ProjectAddView(FormView):
+    template_name = 'projects/admin/project.html'
+    form_class = ProjectAddForm
+    success_url = '/'
+
+    @method_decorator(addprojectenabled_required)
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(ProjectAddView, self).dispatch(*args, **kwargs)
+
+    def form_valid(self, form):
+        project = form.save()
+        ps = PermissionSet()
+        ps.user = self.request.user
+        ps.directory = project.directory
+        ps.save()
+        permission = Permission.objects.get(codename='administrate')
+        ps.positive_permissions.add(permission)
+        return super(ProjectAddView, self).form_valid(form)

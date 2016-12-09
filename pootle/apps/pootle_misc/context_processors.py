@@ -51,6 +51,8 @@ def pootle_context(request):
             'SCRIPT_NAME': settings.SCRIPT_NAME,
             'POOTLE_CACHE_TIMEOUT': settings.POOTLE_CACHE_TIMEOUT,
             'DEBUG': settings.DEBUG,
+            'POOTLE_LOGGEDUSERS_CAN_ADDPROJECTS': settings.POOTLE_LOGGEDUSERS_CAN_ADDPROJECTS,
+            'POOTLE_PROJECTADMIN_CAN_EDITPROJECTS': settings.POOTLE_PROJECTADMIN_CAN_EDITPROJECTS,
         },
         'custom': settings.POOTLE_CUSTOM_TEMPLATE_CONTEXT,
         'ALL_LANGUAGES': Language.live.cached_dict(translation.get_language(),

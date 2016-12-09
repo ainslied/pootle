@@ -106,6 +106,9 @@
           {% if settings.POOTLE_CONTACT_ENABLED %}
             <li><a class="js-contact" href="{% url 'pootle-contact' %}">{% trans "Contact Us" %}</a></li>
           {% endif %}
+          {% if settings.POOTLE_LOGGEDUSERS_CAN_ADDPROJECTS %}
+            <li><a href="{% url 'pootle-project-add' %}">{% trans "Add Project" %}</a></li>
+          {% endif %}
           {% if user.is_authenticated %}
           <li id="user" class="js-navbar-dropdown">
             <a href="{{ user.get_absolute_url }}" data-action="toggle">

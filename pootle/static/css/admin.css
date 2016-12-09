@@ -264,6 +264,7 @@ html[dir="rtl"] .admin-content h2 + .btn
 }
 
 #item-form .fields input,
+#item-form .fields select,
 #item-form .fields textarea,
 #item-form .fields .Select
 {

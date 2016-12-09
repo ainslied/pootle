@@ -30,3 +30,10 @@
   {% trans "Permissions" %}
 </option>
 {% endif %}
+{% if settings.POOTLE_PROJECTADMIN_CAN_EDITPROJECTS and request.permissions.administrate %}
+<option
+  value="admin-edit" class="admin"
+  data-href="{% url 'pootle-project-admin-edit' project.code %}">
+  {% trans "Edit" %}
+</option>
+{% endif %}
